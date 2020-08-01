@@ -44,7 +44,7 @@ const creatButton = (page, type) => `
 `
 
 const renderButtons = (page, numResults, resPerPage) => {
-    const pages = Math.ceil(numResults / resPerPage); // to the next integer
+    const pages = Math.ceil(numResults / resPerPage); // to the next integer 
 
     let button;
     if (page === 1) {
