@@ -1,4 +1,5 @@
 import axios from 'axios';
+import List from './List';
 
 export default class Recipe {
     constructor(id) {
@@ -34,6 +35,8 @@ export default class Recipe {
         // note: ounces and then ounce  // avoid 'ozs'
         const unitsLong = ['tablespoons', 'tablespoon', 'ounces', 'ounce', 'teaspoons', 'teaspoon', 'cups', 'pounds'];
         const unitsShort = ['tbsp', 'tbsp', 'oz', 'oz', 'tsp', 'tsp', 'cup', 'pound'];
+        // add more units 
+        const units = [...unitsShort, 'g']; 
 
         const newIngredients = this.ingredients.map(e => {
             // Uniform units
@@ -47,7 +50,7 @@ export default class Recipe {
 
             // Parse ingredients into count, unit and ingredient
             const arrIng = ingredient.split(' ');
-            const unitIndex = arrIng.findIndex(e2 => unitsShort.includes(e2));
+            const unitIndex = arrIng.findIndex(e2 => units.includes(e2));
 
             let objIng;
             if (unitIndex > -1) {
@@ -87,6 +90,14 @@ export default class Recipe {
         this.ingredients = newIngredients;
 
         //
+    }
+
+    updateServings(type) {
+        const newServings = type === 'inc' ? this.servings + 1 : this.servings - 1;
+
+        this.ingredients.forEach(ing => ing.count *= (newServings / this.servings));
+
+        this.servings = newServings;
     }
     
 }

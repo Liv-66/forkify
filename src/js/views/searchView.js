@@ -1,6 +1,15 @@
 import { elements } from './base';
 
 
+export const highlightSelected = id => {
+    const arrResults = Array.from(document.querySelectorAll('.results__link'));
+    arrResults.forEach(e => e.classList.remove('results__link--active'));
+    // `a[href="#${id}"]`
+    document.querySelector(`a[href="#${id}"]`).classList.add('results__link--active');
+};
+
+
+
 
 const renderRecipe = recipe => {
     const markup = `

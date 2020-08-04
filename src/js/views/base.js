@@ -4,11 +4,15 @@ export const elements = {
     searchResList: document.querySelector('.results__list'),
     searchRes: document.querySelector('.results'),
     searchResPages: document.querySelector('.results__pages'),
-    recipe: document.querySelector('.recipe')
+    recipe: document.querySelector('.recipe'),
+    resultsLink: document.querySelector('.results__link'),
+    shoppingList: document.querySelector('.shopping__list')
+    
 };
 
 export const elementStrings = {
-    loader: 'loader'
+    loader: 'loader',
+    linkActive: 'results__link--active'
 }
 
 export const renderLoader = parent => {
@@ -28,3 +32,14 @@ export const clearLoader = () => {
         loader.parentElement.removeChild(loader);
     }
 }
+
+/*
+// not child
+export const clearHighlightSelected = () => {
+    const highlight = document.querySelector(`.results__link--active`);
+    if (highlight) {
+        highlight.parentElement.removeChild(highlight);
+    }
+    
+};
+*/

@@ -1,8 +1,10 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
+import List from './models/List';
 import * as searchView from './views/searchView';
 import * as recipeView from './views/recipeView';
-import { elements, renderLoader, clearLoader } from './views/base';
+import * as listView from './views/listView';
+import { elements, renderLoader, clearLoader, clearHighlightSelected } from './views/base';
 /**
  * - Search object
  * - Current recipe object
@@ -11,7 +13,7 @@ import { elements, renderLoader, clearLoader } from './views/base';
  */
 const state = {};
 
-
+window.state = state;
 
 /**
  * Search controller
@@ -19,7 +21,6 @@ const state = {};
 const controlSearch = async () => {
     // get the query from view
     const query = elements.searchInput.value;
-    console.log(query);
 
     if(query) {
         // new search object and add to state
@@ -74,6 +75,11 @@ const controlRecipe = async () => {
         elements.recipe.innerHTML = '';
         renderLoader(elements.recipe);
 
+        // Highlight selected search item
+        if(state.search) {
+            searchView.highlightSelected(id);
+        }
+
         // Creat new recipe object
         state.recipe = new Recipe(id);
 
@@ -85,16 +91,12 @@ const controlRecipe = async () => {
     
             // Calculate servings and time
             state.recipe.calcTime();
-            state.recipe.calcServings();
-    
-             
+            state.recipe.calcServings();           
 
             // Render recipe
             clearLoader();
             recipeView.renderRecipe(state.recipe);
 
-            
-            console.log(state.recipe);
 
         } catch (err) {
             alert ('Something wrong with recipe');
@@ -109,3 +111,52 @@ const controlRecipe = async () => {
 //window.addEventListener('hashchange', controlRecipe);
 
 ['hashchange', 'load'].forEach(e => window.addEventListener(e, controlRecipe));
+
+
+/**
+ * List controller
+ */
+const controlList = () => {
+    // Creat List
+    if(!state.list) {
+        state.list = new List();
+    }
+
+    // Add Item
+    state.recipe.ingredients.forEach(e => {
+        const item = state.list.addItem(e.count, e.unit, e.ingredient);
+        // Render Item
+        listView.renderItem(item);
+    })
+
+};
+
+
+// 
+
+elements.recipe.addEventListener('click', e => {
+    // * => any child of the element
+    if (e.target.matches('.btn-decrease, .btn-decrease *')) {
+        if (state.recipe.servings > 1)
+        state.recipe.updateServings('dec');
+        recipeView.updataServingsIngredients(state.recipe);
+    } else if (e.target.matches('.btn-increase, .btn-increase *')) {
+        state.recipe.updateServings('inc');
+        recipeView.updataServingsIngredients(state.recipe);
+    } else if (e.target.matches('.recipe__btn-list, .recipe__btn-list *')) {
+        controlList();
+    }   
+})
+
+elements.shoppingList.addEventListener('click', e => {
+    const id = e.target.closest('.shopping__item').dataset.itemid;
+
+    if (e.target.matches('.shopping__delete, .shopping__delete *')) {
+        state.list.deleteItem(id);
+        listView.deleteItem(id);
+    } else if (e.target.matches('.shopping__count-btn')) {
+        const value = parseFloat(e.target.value);
+        state.list.updataCount(id, value);
+    }
+
+});
