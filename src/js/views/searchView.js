@@ -5,7 +5,7 @@ export const highlightSelected = id => {
     const arrResults = Array.from(document.querySelectorAll('.results__link'));
     arrResults.forEach(e => e.classList.remove('results__link--active'));
     // `a[href="#${id}"]`
-    document.querySelector(`a[href="#${id}"]`).classList.add('results__link--active');
+    document.querySelector(`.results__link[href="#${id}"]`).classList.add('results__link--active');
 };
 
 
@@ -28,7 +28,7 @@ const renderRecipe = recipe => {
     elements.searchResList.insertAdjacentHTML('beforeend', markup);
 };
 
-const limitRecipeTitle = (title, limit = 17) => {
+export const limitRecipeTitle = (title, limit = 17) => {
     const newTitle = []; // const => push array, object
     if (title.length > limit) {
         title.split(' ').reduce((acc, cur) => { // split => array

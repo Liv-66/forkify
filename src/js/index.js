@@ -1,9 +1,11 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import List from './models/List';
+import Likes from './models/Likes';
 import * as searchView from './views/searchView';
 import * as recipeView from './views/recipeView';
 import * as listView from './views/listView';
+import * as likesView from './views/likesView';
 import { elements, renderLoader, clearLoader, clearHighlightSelected } from './views/base';
 /**
  * - Search object
@@ -12,8 +14,6 @@ import { elements, renderLoader, clearLoader, clearHighlightSelected } from './v
  * - Liked recipes
  */
 const state = {};
-
-window.state = state;
 
 /**
  * Search controller
@@ -95,23 +95,18 @@ const controlRecipe = async () => {
 
             // Render recipe
             clearLoader();
-            recipeView.renderRecipe(state.recipe);
+            recipeView.renderRecipe(state.recipe, state.likes.isLike(id));
 
 
         } catch (err) {
             alert ('Something wrong with recipe');
         }
-
     }
-    
-
-
 };
 
 //window.addEventListener('hashchange', controlRecipe);
 
 ['hashchange', 'load'].forEach(e => window.addEventListener(e, controlRecipe));
-
 
 /**
  * List controller
@@ -131,6 +126,43 @@ const controlList = () => {
 
 };
 
+/**
+ * List controller
+ */
+window.addEventListener('load', () => {
+    state.likes = new Likes();
+    state.likes.readStorage();
+    state.likes.likes.forEach(e => likesView.renderLikes(e));
+});
+
+
+ state.likes = new Likes();
+ const controlLike = () => {
+    if(!state.likes) {
+        state.likes = new Likes();
+    }
+    const currentID = state.recipe.id;
+    // User has NOT yet liked current recipe
+    if(!state.likes.isLike(currentID)) {
+        // Add like to the state
+        const like = state.likes.addLike(currentID, state.recipe.title, state.recipe. author, state.recipe.img);
+
+        // Toggle the like button
+        likesView.toggleLikeButton(true);
+
+        // Add Like to UI list
+        likesView.renderLikes(like);
+
+    // User HAS liked current recipe
+    } else {
+        // Remove like from the state
+        state.likes.deleteLike(currentID);
+        // Toggle the like button
+        likesView.toggleLikeButton(false);
+        // Remove like form UI list
+        likesView.deleteLike(currentID);
+    }
+ };
 
 // 
 
@@ -145,7 +177,9 @@ elements.recipe.addEventListener('click', e => {
         recipeView.updataServingsIngredients(state.recipe);
     } else if (e.target.matches('.recipe__btn-list, .recipe__btn-list *')) {
         controlList();
-    }   
+    } else if (e.target.matches('.recipe__love, .recipe__love *')) {
+        controlLike();
+    }
 })
 
 elements.shoppingList.addEventListener('click', e => {
@@ -157,6 +191,5 @@ elements.shoppingList.addEventListener('click', e => {
     } else if (e.target.matches('.shopping__count-btn')) {
         const value = parseFloat(e.target.value);
         state.list.updataCount(id, value);
-    }
-
+    } 
 });

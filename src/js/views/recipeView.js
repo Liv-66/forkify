@@ -3,11 +3,12 @@ import { Fraction } from 'fractional';
 
 
 const formatCount = count => {
-    const [int, dec] = count.toString().split('.').map(e => parseInt(e, 10));
-    if (!dec) return count;
+    const newCount = Math.round(count * 100) / 100;
+    const [int, dec] = newCount.toString().split('.').map(e => parseInt(e, 10));
+    if (!dec) return newCount;
     if (int === 0) {
         // new Fraction
-        const fr = new Fraction(count); 
+        const fr = new Fraction(newCount); 
         // .numerator and .denominator
         return `${fr.numerator}/${fr.denominator}`; 
     } else {
@@ -29,7 +30,7 @@ const creatIngredient = ingredient =>`
     </li>
 `;
 
-export const renderRecipe = recipe => {
+export const renderRecipe = (recipe, isLike) => {
     const markup = `
         <figure class="recipe__fig">
         <img src="${recipe.img}" alt="${recipe.title}" class="recipe__img">
@@ -68,7 +69,7 @@ export const renderRecipe = recipe => {
             </div>
             <button class="recipe__love">
                 <svg class="header__likes">
-                    <use href="img/icons.svg#icon-heart-outlined"></use>
+                    <use href="img/icons.svg#icon-heart${isLike ? '' : '-outlined'}"></use>
                 </svg>
             </button>
         </div>
